@@ -13,11 +13,11 @@ def usreturn(state:pstate) -> pstate:
 
 def convertinr(state:pstate) -> pstate:
     state["total"] = state["totalusd"]*85
-    return pstate
+    return state
 
 def converteur(state:pstate) -> pstate:
     state["total"] = state["totalusd"] *0.9
-    return pstate
+    return state
 
 def choosecurrency(state: pstate) -> pstate:
     return state["target_currency"]
@@ -38,11 +38,14 @@ builder.add_conditional_edges("usreturn_node", choosecurrency, {
     "INR":"convertinr_node",
     "EUR":"converteur_node",
 })
-builder.add_edge(["convertinr_node","converteur_node"], END)
+builder.add_edge("convertinr_node", END)
+builder.add_edge("converteur_node", END)
 
 graph = builder.compile()
 image=graph.get_graph().draw_mermaid_png()
 with open("conditiona.png", "wb") as f:
     f.write(image)
 
-graph.invoke({"usd":1000, "target_currency": "EUR"})
+result = graph.invoke({"usd":1000, "target_currency": "INR"})
+
+print(result)
